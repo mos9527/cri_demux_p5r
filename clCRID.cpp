@@ -42,7 +42,7 @@ char* GetExtension(char* extension, int size, const char* path) {
 //--------------------------------------------------
 char* FixFilename(char* fix_filename, int size, const char* filename) {
 	size = strlen(filename);
-	memset(fix_filename, 0, size);
+	memset(fix_filename, 0, 0x400);
 	int i = 0, index = -1;
 	for (; i < size; i++) if (filename[i] == '\\' || filename[i] == ':') index = i;
 	index++;

@@ -17,7 +17,7 @@ public:
 	bool LoadFile(const char *filename);
 
 	// 分離/マルチプレクサ
-	bool Demux(const char *filename,const char *directory, bool is_demux_video, bool is_demux_info, bool is_demux_audio, bool is_convert_adx, bool is_internal_names);
+	bool Demux(const char *filename,const char *directory, bool is_demux_video, bool is_demux_info, bool is_demux_audio, bool is_convert_adx);
 	bool Mux(const char *filename,const char *filenameMovie,const char *filenameAudio);
 
 	// 取得

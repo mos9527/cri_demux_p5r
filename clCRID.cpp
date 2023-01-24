@@ -111,7 +111,7 @@ bool clCRID::LoadFile(const char *filename){
 //--------------------------------------------------
 // 分離
 //--------------------------------------------------
-bool clCRID::Demux(const char *filename,const char *directory, bool is_demux_video, bool is_demux_info, bool is_demux_audio, bool is_convert_adx, bool is_internal_names){
+bool clCRID::Demux(const char *filename,const char *directory, bool is_demux_video, bool is_demux_info, bool is_demux_audio, bool is_convert_adx){
 
 	// 開放
 	_utf.Release();
@@ -171,47 +171,36 @@ bool clCRID::Demux(const char *filename,const char *directory, bool is_demux_vid
 		case 0x43524944://CRID
 			{
 				if(info.dataType==1){
-					char filename[0x400],fix_filename[0x400];
+					char savename[0x400],fix_filename[0x400];
 					_utf.LoadData(data);
 					for (unsigned int i = 0, count = _utf.GetPageCount(); i < count; i++) {
-						printf(u8"項目 %s (size=%d)\n", _utf.GetElement(i, "filename")->GetValueString(), _utf.GetElement(i, "filesize")->GetValueInt());
+						printf(u8"項目 %s (size=%d) ", _utf.GetElement(i, "filename")->GetValueString(), _utf.GetElement(i, "filesize")->GetValueInt());
 						FixFilename(fix_filename, _countof(fix_filename), _utf.GetElement(i, "filename")->GetValueString());
 						switch (_utf.GetElement(i, "stmid")->GetValueInt()) {
 						case 0x00000000:
 							if (!fpInfo && is_demux_info) {
-								if (is_internal_names) {
-									sprintf_s(filename, _countof(filename), "%s\\%s.ini", directory, fix_filename);
-								}
-								else {
-									sprintf_s(filename, _countof(filename), "%s.ini", directory);
-								}
-								fopen_s(&fpInfo, filename, "wb");
+								sprintf_s(savename, _countof(savename), "%s\\%s.ini", directory, fix_filename);
+								fopen_s(&fpInfo, savename, "wb");								
+								printf("-> %s\n", savename);
 							}
 							break;
 						case 0x40534656: // @SFV
 							if (is_demux_video) {
-								if (is_internal_names) {
-									sprintf_s(filename, _countof(filename), "%s\\%s", directory, fix_filename);
-								}
-								else {
-									sprintf_s(filename, _countof(filename), "%s.m2v", directory);
-								}
-								fopen_s(&sfv_files[i], filename, "wb");
+								sprintf_s(savename, _countof(savename), "%s\\%s", directory, fix_filename);
+								fopen_s(&sfv_files[i], savename, "wb");
 								sfv_index = min(sfv_index, i);
+								printf("-> %s\n", savename);
 							}
 							break;
 						case 0x40534641: // @SFA
 							if (is_demux_audio) {
-								if (is_internal_names) {
-									sprintf_s(filename, _countof(filename), "%s\\%s", directory, fix_filename);									
-								}
-								else {
-									sprintf_s(filename, _countof(filename), "%s.adx", directory);										
-								}
+								sprintf_s(savename, _countof(savename), "%s\\%s", directory, fix_filename);
 								char ext[4];
-								if (is_convert_adx && strcmp(GetExtension(ext, _countof(ext), filename), "wav") != 0)strcat_s(filename, _countof(filename), ".wav");
-								fopen_s(&sfa_files[i], filename, "wb");
+								if (is_convert_adx && strcmp(GetExtension(ext, _countof(ext), filename), "wav") != 0)
+									strcat_s(savename, _countof(savename), ".wav");
+								fopen_s(&sfa_files[i], savename, "wb");
 								sfa_index = min(sfa_index, i);
+								printf("-> %s\n", savename);
 							}
 							break;						
 						}

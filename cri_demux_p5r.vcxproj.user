@@ -4,7 +4,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-n -v -x -i "H:\Etc\SteamLibrary\steamapps\common\P5R\CPK\MOVIE_JE.CPK_unpacked\MOVIE\MOV001.USM"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-n -v -x -i "H:\Etc\SteamLibrary\steamapps\common\P5R\CPK\MOVIE_JE.CPK_unpacked\MOVIE\MOV000.USM"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

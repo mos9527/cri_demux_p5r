@@ -16,9 +16,8 @@
 
 #define MSG_HELP "cri_demux_p5r " __DATE__ " " __TIME__  " [options] file.usm\n" \
     "-o (name) [internal name output folder]\n" \
-    "-n (use internal names)\n" \
-    "-k (key) [8-bytes USM key]\n" \
-    "-m (file) [32-bytes audio mask keyfile]\n" \
+    "-k (key) [8-bytes USM key (i.e.2341683D2FDBA6)]\n" \
+    "-m (file) [path to 32-bytes audio mask keyfile]\n" \
     "-x [demux audio]\n" \
     "-v [demux video]\n" \
     "-i [demux info]\n" \
@@ -67,31 +66,10 @@ char* GetDirectory(char* directory, int size, const char* path) {
 // ディレクトリ作成
 //--------------------------------------------------
 bool DirectoryCreate(const char* directory) {
-
-	// チェック
-	if (!(directory && *directory))return false;
-
-	// 相対パス(ディレクトリ名のみ)
-	if (!(strchr(directory, '\\') || strchr(directory, '/'))) {
-		return _mkdir(directory) == 0;
-	}
-
-	// ディレクトリ名チェック
-	if (directory[1] != ':' || directory[2] != '\\')return false;  // ドライブ記述のチェック
-	if (!directory[3])return false;                          // ドライブ以外の記述チェック
-	if (strpbrk(directory + 3, "/,:;*<|>\""))return false;      // ディレクトリ禁止文字のチェック
-	if (strstr(directory, "\\\\"))return false;               // 連続する'\'記号のチェック
-	if (strstr(directory, " \\"))return false;                // スペースの後の'\'記号のチェック
-
-	// ディレクトリ作成
-	if (_mkdir(directory)) {
-		char current[0x400];
-		if (!GetDirectory(current, _countof(current), directory))return false;
-		if (!DirectoryCreate(current))return false;
-		if (_mkdir(directory))return false;
-	}
-
-	return true;
+	printf(u8"輸出文件夾：%s\n", directory);
+	wchar_t path[1024] = { 0 };
+	MultiByteToWideChar(CP_UTF8, 0, directory, strlen(directory), path, 1024);	
+	return _wmkdir(path) == 0;
 }
 
 //--------------------------------------------------
@@ -109,7 +87,6 @@ int main(int argc, char* argv[]) {
 	bool is_demux_info = false;
 	bool is_demux_audio = false;
 	bool is_convert_adx = false;
-	bool is_internal_names = false;
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-' || argv[i][0] == '/') {
@@ -121,7 +98,6 @@ int main(int argc, char* argv[]) {
 			case 'i':if (i < argc) { is_demux_info = true; }break;
 			case 'x':if (i < argc) { is_demux_audio = true; is_convert_adx = false; }break;
 			case 'c':if (i < argc) { is_convert_adx = true; is_demux_audio = true; }break;
-			case 'n':if (i < argc) { is_internal_names = true; }break;
 			}
 		}
 		else if (*argv[i]) {
@@ -157,14 +133,12 @@ int main(int argc, char* argv[]) {
 			char* d2 = strrchr(path, '/');
 			char* e = strrchr(path, '.');
 			if (e && d1 < e && d2 < e)*e = '\0';
-			if (is_internal_names)
-				strcat_s(path, sizeof(path), ".demux");
+			// strcat_s(path, sizeof(path), ".demux");
 			filenameOut = path;
 		}
 
 		printf(MSG_DEMUXING, argv[i]);
-		if (is_internal_names)
-			DirectoryCreate(filenameOut);
+		DirectoryCreate(filenameOut);
 		clCRID crid(ciphKey);
 
 		FILE* fp;
@@ -178,7 +152,7 @@ int main(int argc, char* argv[]) {
 		}
 
 
-		if (!crid.Demux(argv[i], filenameOut, is_demux_video, is_demux_info, is_demux_audio, is_convert_adx, is_internal_names)) {
+		if (!crid.Demux(argv[i], filenameOut, is_demux_video, is_demux_info, is_demux_audio, is_convert_adx)) {
 			printf(MSG_FAIL);
 		}
 

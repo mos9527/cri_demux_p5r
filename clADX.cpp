@@ -1,13 +1,13 @@
 ﻿
 //--------------------------------------------------
-// ƒCƒ“ƒNƒ‹[ƒh
+// インクルード
 //--------------------------------------------------
 #include "clADX.h"
 #include <stdio.h>
 #include <memory.h>
 
 //--------------------------------------------------
-// ƒCƒ“ƒ‰ƒCƒ“ŠÖ”
+// インライン関数
 //--------------------------------------------------
 inline short bswap(short v){short r=v&0xFF;r<<=8;v>>=8;r|=v&0xFF;return r;}
 inline unsigned short bswap(unsigned short v){unsigned short r=v&0xFF;r<<=8;v>>=8;r|=v&0xFF;return r;}
@@ -18,14 +18,14 @@ inline unsigned long long bswap(unsigned long long v){unsigned long long r=v&0xF
 inline float bswap(float v){unsigned int i=bswap(*(unsigned int *)&v);return *(float *)&i;}
 
 //--------------------------------------------------
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// コンストラクタ
 //--------------------------------------------------
 clADX::clADX():_data(NULL){
 	memset(&_header,0,sizeof(_header));
 }
 
 //--------------------------------------------------
-// ƒfƒXƒgƒ‰ƒNƒ^
+// デストラクタ
 //--------------------------------------------------
 clADX::~clADX(){
 	if(_data){
@@ -35,21 +35,21 @@ clADX::~clADX(){
 }
 
 //--------------------------------------------------
-// ADXƒ`ƒFƒbƒN
+// ADXチェック
 //--------------------------------------------------
 bool clADX::CheckFile(void *data){
 	return (data&&*(unsigned short *)data==0x0080);
 }
 
 //--------------------------------------------------
-// ƒfƒR[ƒh
+// デコード
 //--------------------------------------------------
 bool clADX::Decode(const char *filename,const char *filenameWAV){
 
-	// ƒ`ƒFƒbƒN
+	// チェック
 	if(!(filename&&filenameWAV))return false;
 
-	// ŠJ‚­
+	// 開く
 	FILE *fp,*fp2;
 	if(fopen_s(&fp,filename,"rb"))return false;
 	if(fopen_s(&fp2,filenameWAV,"wb")){fclose(fp);return false;}
@@ -74,7 +74,7 @@ bool clADX::Decode(const char *filename,const char *filenameWAV){
 	}
 	delete [] data;
 
-	// •Â‚¶‚é
+	// 閉じる
 	fclose(fp);
 	fclose(fp2);
 
@@ -82,18 +82,18 @@ bool clADX::Decode(const char *filename,const char *filenameWAV){
 }
 
 //--------------------------------------------------
-// ƒfƒR[ƒh
+// デコード
 //--------------------------------------------------
 bool clADX::Decode(FILE *fp,void *data,int size,unsigned int address){
 
-	// ƒ`ƒFƒbƒN
+	// チェック
 	if(!(fp&&data))return false;
 
-	// ƒwƒbƒ_
+	// ヘッダ
 	if(address==0){
 		if(size<sizeof(_header))return false;
 
-		// ƒwƒbƒ_‚ðŽæ“¾
+		// ヘッダを取得
 		memcpy(&_header,data,sizeof(_header));
 		if(!CheckFile(&_header))return false;
 		//_header.signature=bswap(_header.signature);
@@ -101,7 +101,7 @@ bool clADX::Decode(FILE *fp,void *data,int size,unsigned int address){
 		_header.samplingRate=bswap(_header.samplingRate);
 		_header.sampleCount=bswap(_header.sampleCount);
 
-		// WAVEƒwƒbƒ_‚ð‘‚«ž‚Ý
+		// WAVEヘッダを書き込み
 		struct stWAVEHeader{
 			char riff[4];
 			unsigned int riffSize;
@@ -133,7 +133,7 @@ bool clADX::Decode(FILE *fp,void *data,int size,unsigned int address){
 
 	}
 
-	// ƒf[ƒ^
+	// データ
 	else if(address>=_header.dataOffset&&_data){
 		for(unsigned char *s=(unsigned char *)data,*e=s+size-18*_header.channelCount;s<=e;){
 			int *d=_data;
@@ -160,7 +160,7 @@ bool clADX::Decode(FILE *fp,void *data,int size,unsigned int address){
 }
 
 //--------------------------------------------------
-// ƒfƒR[ƒh ¦ŒŸØ’†
+// デコード ※検証中
 //--------------------------------------------------
 void clADX::Decode(int *d,unsigned char *s){
 	int scale=bswap(*(unsigned short *)s);s+=2;

@@ -25,7 +25,7 @@ public:
 	const char *GetFilename(unsigned int index){return _utf.GetElement(index,"filename")->GetValueString();}
 
     void SetMaskAudioFromFile(FILE *mask);
-
+	void ClearMaskAudio();
 private:
 	struct stInfo{
 		unsigned int signature;      // シグネチャ 'CRID'

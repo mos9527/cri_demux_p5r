@@ -15,9 +15,10 @@
 #define KEY_PERSONA_5_ROYAL_SWITCH_PC 0x2341683D2FDBA6
 
 #define MSG_HELP "cri_demux_p5r " __DATE__ " " __TIME__  " [options] file.usm\n" \
-    "-o (name) [internal name output folder]\n" \
+    "-o (name) [output folder]\n" \
     "-k (key) [8-bytes USM key (i.e.2341683D2FDBA6)]\n" \
-    "-m (file) [path to 32-bytes audio mask keyfile]\n" \
+    "-m (key) [path to 32-bytes audio mask keyfile]\n" \
+	"-n [don't mask audio data]\n" \
     "-x [demux audio]\n" \
     "-v [demux video]\n" \
     "-i [demux info]\n" \
@@ -87,13 +88,14 @@ int main(int argc, char* argv[]) {
 	bool is_demux_info = false;
 	bool is_demux_audio = false;
 	bool is_convert_adx = false;
-
+	bool is_mask_audio = true;
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-' || argv[i][0] == '/') {
 			switch (argv[i][1]) {
 			case 'o':if (i + 1 < argc) { filenameOut = argv[++i]; }break;
 			case 'k':if (i + 1 < argc) { ciphKey = atoi16(argv[++i]); }break;			
 			case 'm':if (i + 1 < argc) { audiomask_name = argv[++i]; }break;
+			case 'n':if (i < argc) { is_mask_audio = false; }break;
 			case 'v':if (i < argc) { is_demux_video = true; }break;
 			case 'i':if (i < argc) { is_demux_info = true; }break;
 			case 'x':if (i < argc) { is_demux_audio = true; is_convert_adx = false; }break;
@@ -151,7 +153,9 @@ int main(int argc, char* argv[]) {
 			fclose(fp);
 		}
 
-
+		if (!is_mask_audio) {
+			crid.ClearMaskAudio();
+		}
 		if (!crid.Demux(argv[i], filenameOut, is_demux_video, is_demux_info, is_demux_audio, is_convert_adx)) {
 			printf(MSG_FAIL);
 		}

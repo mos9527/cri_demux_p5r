@@ -1,11 +1,56 @@
 USM (CRI Movie 2) Demuxer
 
+usage:
+	-o (name) [output folder]
+	-k (key) [8-bytes USM key (i.e.2341683D2FDBA6)]
+	-m (key) [path to 32-bytes audio mask keyfile]
+	-n [don't mask audio data]
+	-x [demux audio]
+	-v [demux video]
+	-i [demux info]
+	-c [convert adx to wav instead of demuxing]
+
 ****
 
 Mod by mos9527
 * multiple streams (if any) will be extracted all at once
 * embeded Persona 5 Royal (Switch/PC Release) USM Key
-* keys are now specifed in 64bits (i.e. no longer divided to hi/low parts)
+* USM keys are now specifed in 64bits (i.e. no longer divided to hi/low parts)
+* added option to NOT mask audio data (see explaination below)
+
+****
+
+Walkthrough : Re-multiplexing USMs from Persona 5 Royal
+(Switch/Steam Release)
+** Extracting USMs
+* The movies are stored in MOVIE_JE.CPK. Extract it w/ https://github.com/Sewer56/CriFsV2Lib
+* For P5R, the following switches are used:
+	cri_demux_p5r.exe -x -v -n -o . [MOV***.USM]
+
+-x,-v Demuxes Video & Audio (w/ the latter, all available audio tracks are extracted)
+
+-n    **IMPORTANT**. See the explaination below:
+
+Some USM files in P5R uses HCA codec for audio tracks. However,
+the demuxer doesn't handle the new encryption scheme CRIWare implemented.
+
+TL;DR, if the TOC listed during extraction has audio files w/ .hca as extension, this switch needed to be there.
+Otherwise, with other extensions like .avi, this switch is needed because they used the legacy XOR crypto (which the demuxer has)
+
+-o . [OPTIONAL] Outputs extracted content in the root directory.
+* Resulting files will ususally have extensions like *.avi (ADPCM for audio,MPEG for video), *.ivf (VP9 video), and *.hca
+
+**Remuxing into common video formats (with FFMpeg)
+
+** Preliminary actions (with *.hca)
+* As explained above, HCA tracks needed to be decrypted seperately. Use https://github.com/vgmstream/vgmstream
+  to convert them to WAVs first.
+
+* Muxing A/V
+  You probably want to come up with something on yourown...
+  The example here combines audio/video w/o re-encoding them into a MKV container
+  
+	ffmpeg -i [audio file] -i [video file] -c:a copy -c:v copy [output].mkv
 
 Original README by bnnm
 ============================================

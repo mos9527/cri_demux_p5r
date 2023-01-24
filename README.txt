@@ -34,7 +34,7 @@ Walkthrough : Re-multiplexing USMs from Persona 5 Royal
 Some USM files in P5R uses HCA codec for audio tracks. However,
 the demuxer doesn't handle the new encryption scheme CRIWare implemented.
 
-TL;DR, if the TOC listed during extraction has audio files w/ .hca as extension, this switch needes to NOT be there so external tools can handle it themselves.
+TL;DR, if the TOC listed during extraction has audio files w/ .hca as extension, this switch needes to be there so external tools can handle it themselves.
 Otherwise, with other extensions like .avi, this switch is needed because they used the legacy XOR crypto (which the demuxer has)
 
 -o . [OPTIONAL] Outputs extracted content in the root directory.

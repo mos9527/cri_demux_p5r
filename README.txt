@@ -27,15 +27,15 @@ Walkthrough : Re-multiplexing USMs from Persona 5 Royal
 * For P5R, the following switches are used:
 	cri_demux_p5r.exe -x -v -n -o . [MOV***.USM]
 
--x,-v Demuxes Video & Audio (w/ the latter, all available audio tracks are extracted)
+-v,-x Demuxes Video & Audio (w/ the latter, all available audio tracks are extracted)
 
 -n    **IMPORTANT**. See the explaination below:
 
-Some USM files in P5R uses HCA codec for audio tracks. However,
+Most USM files in P5R uses HCA codec for audio tracks. However,
 the demuxer doesn't handle the new encryption scheme CRIWare implemented.
 
 TL;DR, if the TOC listed during extraction has audio files w/ .hca as extension, this switch needes to be there so external tools can handle it themselves.
-Otherwise, with other extensions like .avi, this switch is needed because they used the legacy XOR crypto (which the demuxer has)
+Otherwise, with other extensions like .avi, this switch is not needed because they used the legacy XOR crypto (which the demuxer has)
 
 -o . [OPTIONAL] Outputs extracted content in the root directory.
 * Resulting files will ususally have extensions like *.avi (ADPCM for audio,MPEG for video), *.ivf (VP9 video), and *.hca
